@@ -8,63 +8,8 @@ let currentDisplayData = [];
 let showBtn = true;
 
 export class Ui {
-  check() {
-    if (currentDisplayData.length > currentDisplay) {
-      let num = currentDisplay - currentDisplayData.length;
-
-      if (num <= -20) {
-        currentDisplay += 20;
-
-        return currentDisplay;
-      } else {
-        currentDisplay = currentDisplayData.length;
-
-        return currentDisplay;
-      }
-    } else {
-      currentDisplay = currentDisplayData.length;
-
-      return currentDisplay;
-    }
-  }
-
   resetCurrentDisplay() {
     currentDisplay = 20;
-  }
-
-  showMoreData() {
-    if (showBtn) {
-      const showMoreBtn = document.createElement("button");
-      showMoreBtn.className = "show-more btn btn-primary d-flex mx-auto mt-4";
-      showMoreBtn.textContent = "Show more";
-
-      document
-        .querySelector(".games-cards .container")
-        .appendChild(showMoreBtn);
-
-      showBtn = false;
-    }
-
-    if (currentDisplayData.length < currentDisplay) {
-      document
-        .querySelector(".show-more")
-        ?.classList.replace("d-flex", "d-none");
-
-      return;
-    } else
-      document
-        .querySelector(".show-more")
-        ?.classList.replace("d-none", "d-flex");
-
-    document.querySelector(".show-more").addEventListener("click", () => {
-      if (currentDisplayData.length <= currentDisplay) {
-        document.querySelector(".show-more").classList.add("d-none");
-        return;
-      } else {
-        this.check();
-        this.displayGames(currentDisplayData);
-      }
-    });
   }
 
   displayGames(data) {
@@ -100,13 +45,9 @@ export class Ui {
                   alt="${title}, ${short_description}"
                   loading="lazy"
                 />
-                <video class="w-100 d-none rounded-top-3" loop muted>
-                    <source
-                      src="https://www.freetogame.com/g/${id}/videoplayback.webm"
-                      type="video/mp4"
-                    />
+                <video src="https://www.freetogame.com/g/${id}/videoplayback.webm" class="w-100 d-none rounded-top-3" loop muted>
                     Your browser does not support the video tag.
-                  </video>
+                </video>
               </div>
               <div class="card-body px-3 pt-3">
                 <div
@@ -132,33 +73,14 @@ export class Ui {
     }
     const cards = document.querySelectorAll(".card");
 
-    cards.forEach((el) => {
-      const img = el.querySelector(".image img");
-      const video = el.querySelector(".image video");
+    cards.forEach((el) => this.showVideoHover(el));
 
-      el.addEventListener("mouseenter", () => {
-        video.style.height = `${img.getBoundingClientRect().height}px`;
-
-        img.classList.replace("d-block", "d-none");
-        video.classList.replace("d-none", "d-block");
-
-        video.setAttribute("preload", "auto");
-
-        video.play();
-      });
-
-      el.addEventListener("mouseleave", () => {
-        img.classList.replace("d-none", "d-block");
-        video.classList.replace("d-block", "d-none");
-        video.pause();
-      });
-    });
     spinner.classList.contains("active") && spinner.classList.remove("active");
   }
 
   displayDetails(data) {
-    console.log(data);
     const {
+      id,
       title,
       genre,
       game_url,
@@ -168,18 +90,20 @@ export class Ui {
       publisher,
       platform,
       screenshots,
-      minimum_system_requirements,
     } = data;
 
     detailsContent.innerHTML = `
-      <div class="row mt-5 flex-grow-1">
-              <div class="col-lg-4 mb-4 image">
+      <div class="row box-detail-content mt-5 flex-grow-1">
+              <div class="col-lg-4 mb-4 image" style="height: fit-content";>
                 <img
                   src="${imageCover}"
                   alt="${title}"
-                  class="img-fluid rounded-1"
+                  class="img-fluid rounded-1 d-block"
                   loading="lazy"
                 />
+                <video src="https://www.freetogame.com/g/${id}/videoplayback.webm" class="d-none rounded-top-3" loop muted>
+                    Your browser does not support the video tag.
+                </video>
               </div>
               <div class="col-lg-8 info">
                 <ul class="m-0 list-unstyled list-statue">
@@ -224,7 +148,85 @@ export class Ui {
       document.getElementById("imageStore").appendChild(li);
     }
 
+    const imageDetail = document.querySelector(".box-detail-content .image");
+
+    this.showVideoHover(imageDetail);
+
     detailsSection.classList.add("active");
     spinner.classList.remove("active");
+  }
+
+  showMoreData() {
+    if (showBtn) {
+      const showMoreBtn = document.createElement("button");
+      showMoreBtn.className = "show-more btn btn-primary d-flex mx-auto mt-4";
+      showMoreBtn.textContent = "Show more";
+
+      document
+        .querySelector(".games-cards .container")
+        .appendChild(showMoreBtn);
+
+      showMoreBtn.addEventListener("click", () => {
+        if (currentDisplayData.length <= currentDisplay) {
+          document.querySelector(".show-more").classList.add("d-none");
+          return;
+        } else {
+          this.check();
+          this.displayGames(currentDisplayData);
+        }
+      });
+
+      showBtn = false;
+    }
+
+    if (currentDisplayData.length < currentDisplay) {
+      document
+        .querySelector(".show-more")
+        ?.classList.replace("d-flex", "d-none");
+
+      return;
+    } else
+      document
+        .querySelector(".show-more")
+        ?.classList.replace("d-none", "d-flex");
+  }
+
+  showVideoHover(element) {
+    const img = element.querySelector(".image img");
+    const video = element.querySelector(".image video");
+
+    element.addEventListener("mouseenter", () => {
+      video.style.height = `${img.getBoundingClientRect().height}px`;
+      video.style.width = `${img.getBoundingClientRect().width}px`;
+
+      img.classList.replace("d-block", "d-none");
+      video.classList.replace("d-none", "d-block");
+
+      video.setAttribute("preload", "auto");
+      video.play();
+    });
+
+    element.addEventListener("mouseleave", () => {
+      img.classList.replace("d-none", "d-block");
+      video.classList.replace("d-block", "d-none");
+      video.pause();
+    });
+  }
+
+  check() {
+    if (currentDisplayData.length > currentDisplay) {
+      let num = currentDisplay - currentDisplayData.length;
+
+      console.log(currentDisplay);
+      console.log(num);
+
+      if (num <= -20) {
+        currentDisplay += 20;
+      } else {
+        currentDisplay = currentDisplayData.length;
+      }
+    } else {
+      currentDisplay = currentDisplayData.length;
+    }
   }
 }

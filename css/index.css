@@ -62,8 +62,7 @@ header img {
 
 /* Nav */
 nav {
-  position: relative;
-  /* top: -50px; */
+  top: 36px;
 }
 
 nav .logo img {
@@ -186,4 +185,27 @@ section.details #imageStore li {
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Scroll Top */
+
+.scroll-top {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  background-color: var(--main-color);
+  right: 30px;
+  bottom: 30px;
+  transition: var(--main-transition);
+  visibility: hidden;
+  opacity: 0;
+}
+
+.scroll-top.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+.scroll-top:hover {
+  opacity: 0.8;
 }
